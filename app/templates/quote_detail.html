@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quote Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% include 'flash_messages.html' %}
+    <div class="container">
+        <h2>Quote Details</h2>
+        <div class="detail"><label>Reference:</label> {{ quote.reference_number }}</div>
+        <div class="detail"><label>Customer Name:</label> {{ quote.customer_name }}</div>
+        <div class="detail"><label>Vehicle Registration:</label> {{ quote.vehicle_registration }}</div>
+        <div class="detail"><label>Postcode:</label> {{ quote.postcode }}</div>
+        <div class="detail"><label>Start Date:</label> {{ quote.start_date.strftime('%Y-%m-%d %H:%M') }}</div>
+        <div class="detail"><label>Status:</label> {{ quote.status|capitalize }}</div>
+        <div class="detail"><label>Created At:</label> {{ quote.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+        <a class="back-link" href="{{ url_for('main.list_quotes') }}">Back to Quotes</a>
+    </div>
+</body>
+</html>

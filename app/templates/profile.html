@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% include 'flash_messages.html' %}
+    <div class="profile-container">
+        <h2>Update Profile</h2>
+        <a href="{{ url_for('main.index') }}" class="action-btn secondary">
+            ← Back to Dashboard
+        </a>
+        <form method="post">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}">
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" value="{{ user.address }}">
+            <label for="password">New Password:</label>
+            <input type="password" id="password" name="password">
+            <button type="submit">Update</button>
+        </form>
+    </div>
+</body>
+</html>

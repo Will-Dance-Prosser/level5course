@@ -1,0 +1,7 @@
+{
+  "mssql": {
+    "server": "(localdb)\\MSSQLLocalDB",
+    "database": "Breakdown",
+    "driver": "ODBC Driver 17 for SQL Server"
+  }
+}

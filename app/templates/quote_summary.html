@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quote Summary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% include 'flash_messages.html' %}
+    <div class="summary-container">
+        <h2>Breakdown Cover Quote Summary</h2>
+        <dl class="summary-list">
+            <dt class="summary-ref">Quote Ref:</dt>
+            <dd class="summary-ref-number">{{ reference_number }}</dd>
+            <dt class="summary-expiry">Expires</dt>
+            <dd class="summary-expiry-value">{{ expiry_date.replace('in', 'in').replace('today', 'today').replace('expired', 'expired') }}</dd>
+            <dt>Name:</dt>
+            <dd>{{ customer_name }}</dd>
+            <dt>Vehicle Reg:</dt>
+            <dd>{{ vehicle_reg }}</dd>
+            <dt>Postcode:</dt>
+            <dd>{{ postcode }}</dd>
+        </dl>
+        <div class="split-prices">
+            <div class="price-box annual">
+                <h3>Pay in One Go</h3>
+                <ul class="product-list">
+                    {% for product in annual_products %}
+                        <li>
+                            <span class="emoji">
+                                {% if product.product_code == "Roadside" %}🚗{% elif product.product_code == "Relay" %}🔄{% elif product.product_code == "HomeStart" %}🏠{% elif product.product_code == "PartsCover" %}🔧{% else %}🛡️{% endif %}
+                            </span>
+                            <span class="product-name">{{ product.product_code }}</span>
+                            <span class="product-price">£{{ product.total }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="price-total">Total: £{{ annual_total }}</div>
+            </div>
+            <div class="price-box monthly">
+                <h3>Pay in Monthly Installments</h3>
+                <ul class="product-list">
+                    {% for product in monthly_products %}
+                        <li>
+                            <span class="emoji">
+                                {% if product.product_code == "Roadside" %}🚗{% elif product.product_code == "Relay" %}🔄{% elif product.product_code == "HomeStart" %}🏠{% elif product.product_code == "PartsCover" %}🔧{% else %}🛡️{% endif %}
+                            </span>
+                            <span class="product-name">{{ product.product_code }}</span>
+                            <span class="product-price">£{{ product.total }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="price-total">Total: £{{ monthly_total }}</div>
+            </div>
+        </div>
+        <div class="quote-actions">
+            <a href="{{ url_for('main.list_quotes') }}" class="action-btn secondary">← View All Quotes</a>
+            {% if quote.status != 'accepted' %}
+                <form method="post" action="{{ url_for('main.accept_quote', reference_number=reference_number) }}" style="display:inline;">
+                    <button type="submit" class="action-btn primary">Accept Quote</button>
+                </form>
+            {% else %}
+                <span class="action-btn accepted">Policy Active</span>
+            {% endif %}
+            <a href="{{ url_for('main.create_quote') }}" class="action-btn new">Start New Quote</a>
+            {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('main.quote_xmls', quote_id=quote.quote_id) }}" class="action-btn xml">View XML</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

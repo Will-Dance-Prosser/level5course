@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Quote XMLs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% include 'flash_messages.html' %}
+    <div class="xmls-container">
+        <!-- Back to Quote Summary at the top -->
+        <a href="{{ url_for('main.quote_summary', reference_number=xmls[0].quote.reference_number if xmls else '') }}" class="back-link">
+            ← Back to Quote Summary
+        </a>
+        <h2>Quote XMLs</h2>
+        {% set request_xmls = xmls | selectattr('xml_type', 'equalto', 'request') | list %}
+        {% set response_xmls = xmls | selectattr('xml_type', 'equalto', 'response') | list %}
+
+        {% if request_xmls %}
+            <h3>Request XML</h3>
+            {% for xml in request_xmls %}
+                <div class="xml-meta">
+                    <strong>Timestamp:</strong> {{ xml.timestamp.strftime('%Y-%m-%d %H:%M:%S') if xml.timestamp else '' }}
+                </div>
+                <pre class="xml-block">{{ xml.xml_content | e }}</pre>
+            {% endfor %}
+        {% endif %}
+
+        {% if response_xmls %}
+            <h3>Response XML</h3>
+            {% for xml in response_xmls %}
+                <div class="xml-meta">
+                    <strong>Timestamp:</strong> {{ xml.timestamp.strftime('%Y-%m-%d %H:%M:%S') if xml.timestamp else '' }}
+                </div>
+                <pre id="xml-block-{{ xml.quote_xml_id }}" class="xml-block">{{ xml.xml_content | e }}</pre>
+                {% if session.get('role') == 'admin' %}
+                <form method="post" action="{{ url_for('main.xml_detail', xml_id=xml.quote_xml_id) }}" class="xml-edit-form">
+                    <textarea id="xml-textarea-{{ xml.quote_xml_id }}" name="xml_content" class="xml-edit-area" style="display:none;">{{ xml.xml_content }}</textarea>
+                    <button type="button" id="edit-btn-{{ xml.quote_xml_id }}" onclick="toggleEdit('{{ xml.quote_xml_id }}')" class="action-btn xml-edit-btn">Make Changes</button>
+                    <button type="submit" id="save-btn-{{ xml.quote_xml_id }}" class="action-btn xml-save-btn" style="display:none;">Save</button>
+                </form>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if not xmls %}
+            <p>No XML records found for this quote.</p>
+        {% endif %}
+        <!-- Back to Quote Summary at the bottom -->
+        <a href="{{ url_for('main.quote_summary', reference_number=xmls[0].quote.reference_number if xmls else '') }}" class="back-link">
+            ← Back to Quote Summary
+        </a>
+    </div>
+</body>
+<script>
+function toggleEdit(xmlId) {
+    var block = document.getElementById('xml-block-' + xmlId);
+    var textarea = document.getElementById('xml-textarea-' + xmlId);
+    var editBtn = document.getElementById('edit-btn-' + xmlId);
+    var saveBtn = document.getElementById('save-btn-' + xmlId);
+    if (textarea.style.display === 'none' || textarea.style.display === '') {
+        textarea.style.display = 'block';
+        block.style.display = 'none';
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-block';
+    } else {
+        textarea.style.display = 'none';
+        block.style.display = 'block';
+        editBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+    }
+}
+</script>
+</html>

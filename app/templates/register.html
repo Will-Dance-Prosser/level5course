@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Quote Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Register</h2>
+        {% include 'flash_messages.html' %}
+        <form method="post" action="{{ url_for('main.register') }}">
+            <div class="form-group">
+                <label for="usertype">User Type</label>
+                <select id="usertype" name="usertype" required autocomplete="usertype">
+                    <option value="">Select user type</option>
+                    <option value="regular" {% if usertype == 'regular' %}selected{% endif %}>Regular User</option>
+                    <option value="admin" {% if usertype == 'admin' %}selected{% endif %}>Admin User</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" name="username" type="text" required autocomplete="username" maxlength="16" pattern=".{1,16}" title="Username must be 1-16 characters long" value="{{ username|default('') }}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" required autocomplete="email" oninput="validateEmail()" value="{{ email|default('') }}">
+                <span id="email-error" class="input-error">Please enter a valid email address.</span>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" required autocomplete="new-password" minlength="6" maxlength="24" title="Password must be 6-24 characters long" oninput="validatePasswords()">
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input id="confirm_password" name="confirm_password" type="password" required autocomplete="new-password" minlength="6" maxlength="24" title="Password must be 6-24 characters long" oninput="validatePasswords()">
+                <span id="password-error" class="input-error">Passwords do not match.</span>
+            </div>
+            <input type="submit" value="Register">
+        </form>
+        <a class="register-link" href="{{ url_for('main.login') }}">Already have an account? Login</a>
+    </div>
+    <script>
+function validateEmail() {
+    const emailInput = document.getElementById('email');
+    const emailError = document.getElementById('email-error');
+    if (emailInput.validity.typeMismatch || !emailInput.value) {
+        emailError.classList.add('active');
+    } else {
+        emailError.classList.remove('active');
+    }
+}
+function validatePasswords() {
+    const pw1 = document.getElementById('password');
+    const pw2 = document.getElementById('confirm_password');
+    const pwError = document.getElementById('password-error');
+    if (pw1.value && pw2.value && pw1.value !== pw2.value) {
+        pwError.classList.add('active');
+    } else {
+        pwError.classList.remove('active');
+    }
+}
+</script>
+</body>
+</html>

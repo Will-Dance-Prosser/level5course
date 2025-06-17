@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quotes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% include 'flash_messages.html' %}
+    <div class="quotes-container">
+        <div class="top-links">
+            <a href="{{ url_for('main.create_quote') }}" class="action-btn">Create New Quote</a>
+            <a href="{{ url_for('main.index') }}" class="action-btn secondary">Dashboard</a>
+            <a href="{{ url_for('main.logout') }}" class="action-btn secondary">Logout</a>
+        </div>
+        <h2>Quotes</h2>
+        <form method="get" action="{{ url_for('main.list_quotes') }}" class="search-form">
+            <div class="search-columns">
+                <div class="search-col">
+                    <div class="form-group">
+                        <label for="reference">Reference Number</label>
+                        <input id="reference" name="reference" type="text" maxlength="50" value="{{ request.args.get('reference', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicle">Vehicle Registration</label>
+                        <input id="vehicle" name="vehicle" type="text" maxlength="8" pattern="[A-Za-z0-9 ]+" value="{{ request.args.get('vehicle', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="">Any</option>
+                            <option value="accepted" {% if request.args.get('status') == 'accepted' %}selected{% endif %}>Accepted</option>
+                            <option value="expired" {% if request.args.get('status') == 'expired' %}selected{% endif %}>Expired</option>
+                            <option value="cancelled" {% if request.args.get('status') == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="search-col">
+                    <div class="form-group">
+                        <label for="customer">Customer Name</label>
+                        <input id="customer" name="customer" type="text" maxlength="50" pattern="[A-Za-z .'-]+" value="{{ request.args.get('customer', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="postcode">Postcode</label>
+                        <input id="postcode" name="postcode" type="text" maxlength="8" pattern="[A-Za-z0-9 ]+" value="{{ request.args.get('postcode', '') }}">
+                    </div>
+                </div>
+            </div>
+            <input type="submit" value="Filter" class="action-btn">
+        </form>
+        {% if quotes %}
+        <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Reference Number</th>
+                    <th>Customer Name</th>
+                    <th>Vehicle Registration</th>
+                    <th>Postcode</th>
+                    <th>Status</th>
+                    <th>Date Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quote in quotes %}
+                <tr>
+                    <td>{{ quote.reference_number }}</td>
+                    <td>{{ quote.customer_name }}</td>
+                    <td>{{ quote.vehicle_registration }}</td>
+                    <td>{{ quote.postcode }}</td>
+                    <td>{{ quote.status|capitalize }}</td>
+                    <td>{{ quote.created_at.strftime('%Y-%m-%d %H:%M') if quote.created_at else '' }}</td>
+                    <td>
+                        <div class="action-btn-group">
+                            <a href="{{ url_for('main.quote_summary', reference_number=quote.reference_number) }}" class="action-btn" title="View">View</a>
+                            <a href="{{ url_for('main.delete_quote', reference_number=quote.reference_number) }}" class="action-btn danger" title="Delete" onclick="return confirm('Are you sure you want to delete this quote?');">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+            <p>No quotes found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

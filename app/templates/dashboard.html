@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+        <h2>Welcome, {{ user.username }}!</h2>
+        <div class="dashboard-grid">
+            <!-- Left Column: User Info & Profile -->
+            <div class="card">
+                <h3>Your Info</h3>
+                <div class="user-info">
+                    <div><strong>Email:</strong> {{ user.email }}</div>
+                    <div><strong>Role:</strong> {{ user.role|capitalize }}</div>
+                </div>
+                <div class="button-stack">
+                    <a href="{{ url_for('main.profile') }}" class="action-btn secondary">My Profile</a>
+                    <a href="{{ url_for('main.logout') }}" class="action-btn secondary">Logout</a>
+                </div>
+            </div>
+
+            <!-- Right Column: Quick Actions -->
+            <div class="card">
+                <h3>Quick Actions</h3>
+                <div class="dashboard-links">
+                    <a href="{{ url_for('main.create_quote') }}" class="action-btn">Create a Quote</a>
+                    <a href="{{ url_for('main.list_quotes') }}" class="action-btn">View Quotes</a>
+                    {% if session.get('role') == 'admin' %}
+                        <a href="{{ url_for('main.search') }}" class="action-btn">Deep Search</a>
+                        <a href="{{ url_for('main.view_users') }}" class="action-btn">View All Users</a>
+                        <a href="{{ url_for('main.list_logs') }}" class="action-btn">View Logs</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

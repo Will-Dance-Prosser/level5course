@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>System Logs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% include 'flash_messages.html' %}
+    <div class="logs-container">
+        <h2>System Logs</h2>
+        <form method="get" class="filter-form">
+            <input type="text" name="user_id" placeholder="User ID" value="{{ request.args.get('user_id', '') }}">
+            <select name="action">
+                <option value="">Action</option>
+                <option value="viewed" {% if request.args.get('action') == 'viewed' %}selected{% endif %}>Viewed</option>
+                <option value="created" {% if request.args.get('action') == 'created' %}selected{% endif %}>Created</option>
+                <option value="accepted" {% if request.args.get('action') == 'accepted' %}selected{% endif %}>Accepted</option>
+                <option value="deleted" {% if request.args.get('action') == 'deleted' %}selected{% endif %}>Deleted</option>
+                <option value="updated" {% if request.args.get('action') == 'updated' %}selected{% endif %}>Updated</option>
+            </select>
+            <button type="submit">Filter</button>
+            <a href="{{ url_for('main.list_logs') }}" class="clear-btn">Clear</a>
+        </form>
+        <table>
+            <tr>
+                <th>Timestamp</th>
+                <th>User ID</th>
+                <th>Quote ID</th>
+                <th>Action</th>
+                <th>Details</th>
+            </tr>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') if log.timestamp else '' }}</td>
+                <td>{{ log.user_id }}</td>
+                <td>{{ log.quote_id or '' }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.details }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="{{ url_for('main.index') }}" class="back-link">Back to Dashboard</a>
+    </div>
+</body>
+</html>

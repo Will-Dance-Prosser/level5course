@@ -1,0 +1,12 @@
+<div class="navbar">
+    <h1>Breakdown Policy Dashboard</h1>
+    <div class="nav-links">
+        <a href="{{ url_for('main.index') }}">Home</a>
+        <a href="{{ url_for('main.profile') }}">Profile</a>
+        {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('main.search') }}">Deep Search</a>
+            <a href="{{ url_for('main.view_users') }}">View All Users</a>
+        {% endif %}
+        <a href="{{ url_for('main.logout') }}">Logout</a>
+    </div>
+</div>

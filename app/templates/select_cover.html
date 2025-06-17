@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Breakdown Cover</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% include 'flash_messages.html' %}
+    <div class="cover-container">
+        <h2>Select Breakdown Cover</h2>
+        <form method="post">
+            <div class="cover-options">
+                {% set icons = {
+                    'Roadside': '🚗',
+                    'Relay': '🔄',
+                    'HomeStart': '🏠',
+                    'PartsCover': '🔧'
+                } %}
+                {% for cover in cover_types %}
+                    <label class="cover-card">
+                        <span class="cover-icon">{{ icons.get(cover, '🛡️') }}</span>
+                        <span class="cover-label">{{ cover }}</span>
+                        <input type="checkbox" name="cover_type[]" value="{{ cover }}" {% if cover in selected_covers %}checked{% endif %}>
+                    </label>
+                {% endfor %}
+            </div>
+            <input type="submit" value="Next" class="action-btn">
+        </form>
+        <a class="back-link" href="{{ url_for('main.create_quote') }}">Back</a>
+    </div>
+</body>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.cover-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+        });
+</script>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Quotes & XML</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="quote-container">
+        <h2>Search Quotes & XML</h2>
+        {% include 'flash_messages.html' %}
+        <form method="get" action="{{ url_for('main.search') }}">
+            <div class="search-columns">
+                <!-- Left: DB fields -->
+                <div class="search-col">
+                    <div class="form-group">
+                        <label for="customer_name">Customer Name</label>
+                        <input id="customer_name" name="customer_name" type="text" value="{{ request.args.get('customer_name', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicle_reg">Vehicle Registration</label>
+                        <input id="vehicle_reg" name="vehicle_reg" type="text" value="{{ request.args.get('vehicle_reg', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="postcode">Postcode</label>
+                        <input id="postcode" name="postcode" type="text" value="{{ request.args.get('postcode', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="date_of_birth">Date of Birth</label>
+                        <input id="date_of_birth" name="date_of_birth" type="date" value="{{ request.args.get('date_of_birth', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="products">Products</label>
+                        <div class="custom-multiselect" id="productsDropdown">
+                            <button type="button" class="dropdown-btn" onclick="toggleProductsDropdown()" id="productsDropdownBtn">Select Products</button>
+                            <div class="dropdown-list" id="productsDropdownList" style="display:none;">
+                                <label><input type="checkbox" name="products" value="" id="allProductsCheckbox" {% if not request.args.getlist('products') %}checked{% endif %}> All Products</label><br>
+                                <label><input type="checkbox" name="products" value="Roadside" {% if 'Roadside' in request.args.getlist('products') %}checked{% endif %}> Roadside</label><br>
+                                <label><input type="checkbox" name="products" value="Relay" {% if 'Relay' in request.args.getlist('products') %}checked{% endif %}> Relay</label><br>
+                                <label><input type="checkbox" name="products" value="HomeStart" {% if 'HomeStart' in request.args.getlist('products') %}checked{% endif %}> HomeStart</label><br>
+                                <label><input type="checkbox" name="products" value="PartsCover" {% if 'PartsCover' in request.args.getlist('products') %}checked{% endif %}> PartsCover</label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="products_hidden" id="productsHidden">
+                        <small style="color:#666;display:block;margin-top:0.3rem;">Select multiple. If 'All Products' is checked, no filter is applied.</small>
+                    </div>
+                </div>
+                <!-- Right: XML fields -->
+                <div class="search-col">
+                    <div class="form-group">
+                        <label for="payment_type">Payment Type (XML)</label>
+                        <select id="payment_type" name="payment_type">
+                            <option value="">-- Any --</option>
+                            <option value="Annual" {% if request.args.get('payment_type') == 'Annual' %}selected{% endif %}>Annual</option>
+                            <option value="Monthly" {% if request.args.get('payment_type') == 'Monthly' %}selected{% endif %}>Monthly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="commission">Commission</label>
+                        <input id="commission" name="commission" type="text" value="{{ request.args.get('commission', '') }}" placeholder="e.g '10.00'">
+                    </div>
+                    <div class="form-group">
+                        <label for="arrangement">Arrangement Fee</label>
+                        <input id="arrangement" name="arrangement" type="text" value="{{ request.args.get('arrangement', '') }}" placeholder="e.g '10.00'">
+                    </div>
+                    <div class="form-group">
+                        <label for="net">Net Fee</label>
+                        <input id="net" name="net" type="text" value="{{ request.args.get('net', '') }}" placeholder="e.g '10.00'">
+                    </div>
+                </div>
+            </div>
+            <input type="submit" value="Search">
+        </form>
+        <a class="back-link" href="{{ url_for('main.list_quotes') }}">Back to Quotes</a>
+
+        {% if quotes is not none %}
+            <hr style="margin:2rem 0;">
+            <h3>Results</h3>
+            {% if quotes %}
+                <table>
+                    <tr>
+                        <th>Reference Number</th>
+                        <th>Customer Name</th>
+                        <th>Vehicle Reg</th>
+                        <th>Postcode</th>
+                        <th>Date of Birth</th>
+                    </tr>
+                    {% for quote in quotes %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('main.quote_summary', reference_number=quote.reference_number) }}">
+                                {{ quote.reference_number }}
+                            </a>
+                        </td>
+                        <td>{{ quote.customer_name }}</td>
+                        <td>{{ quote.vehicle_registration }}</td>
+                        <td>{{ quote.postcode }}</td>
+                        <td>{{ quote.date_of_birth }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                {% if request.args %}
+                    <p class="no-results">No results found.</p>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <script>
+    function toggleProductsDropdown() {
+        var list = document.getElementById('productsDropdownList');
+        list.style.display = (list.style.display === 'block') ? 'none' : 'block';
+    }
+    document.addEventListener('click', function(event) {
+        var dropdown = document.getElementById('productsDropdownList');
+        var btn = document.getElementById('productsDropdownBtn');
+        if (!dropdown.contains(event.target) && event.target !== btn) {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    // Checkbox logic for All Products
+    const allCheckbox = document.getElementById('allProductsCheckbox');
+    const checkboxes = Array.from(document.querySelectorAll('#productsDropdownList input[type=checkbox]')).filter(cb => cb !== allCheckbox);
+    allCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            checkboxes.forEach(cb => cb.checked = false);
+        }
+    });
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            if (this.checked) {
+                allCheckbox.checked = false;
+            }
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.venv
+.env
+*.env
+
+venv/
+*.db
+*.sqlite3
+.DS_Store
+htmlcov/
+flask_session/
+# VSCode settings
+.vscode/
+# Python egg files
+dist/
+build/
+*.egg-info/
+# Pytest cache
+.pytest_cache/
+# Coverage reports
+.coverage
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# System files
+Thumbs.db

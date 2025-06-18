@@ -3,10 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from flask_login import current_user
 import os
+import dotenv
 
 db = SQLAlchemy()
 
 def create_app():
+    dotenv.load_dotenv()
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

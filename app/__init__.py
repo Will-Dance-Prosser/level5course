@@ -27,4 +27,6 @@ def create_app():
     def inject_user():
         return dict(current_user=current_user)
 
+    print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
+
     return app

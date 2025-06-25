@@ -10,57 +10,161 @@
     <div class="login-container">
         <h2>Register</h2>
         {% include 'flash_messages.html' %}
+        
+        <!-- Registration Form -->
         <form method="post" action="{{ url_for('main.register') }}">
+            <!-- User Type Selection -->
             <div class="form-group">
                 <label for="usertype">User Type</label>
-                <select id="usertype" name="usertype" required autocomplete="usertype">
-                    <option value="">Select user type</option>
+                <select id="usertype" name="usertype" required>
+                    <option value="">Please select...</option>
                     <option value="regular" {% if usertype == 'regular' %}selected{% endif %}>Regular User</option>
                     <option value="admin" {% if usertype == 'admin' %}selected{% endif %}>Admin User</option>
                 </select>
             </div>
+
+            <!-- Username Field -->
             <div class="form-group">
                 <label for="username">Username</label>
-                <input id="username" name="username" type="text" required autocomplete="username" maxlength="16" pattern=".{1,16}" title="Username must be 1-16 characters long" value="{{ username|default('') }}">
+                <input 
+                    id="username" 
+                    name="username" 
+                    type="text" 
+                    required 
+                    maxlength="16" 
+                    pattern=".{1,16}" 
+                    title="Username must be 1-16 characters long"
+                    value="{{ username|default('') }}"
+                >
+                <span id="username-error" class="input-error"></span>
             </div>
+
+            <!-- Email Field -->
             <div class="form-group">
-                <label for="email">Email</label>
-                <input id="email" name="email" type="email" required autocomplete="email" oninput="validateEmail()" value="{{ email|default('') }}">
-                <span id="email-error" class="input-error">Please enter a valid email address.</span>
+                <label for="email">Email Address</label>
+                <input 
+                    id="email" 
+                    name="email" 
+                    type="email" 
+                    required 
+                    oninput="validateEmail()" 
+                    value="{{ email|default('') }}"
+                >
+                <span id="email-error" class="input-error">Please enter a valid email address</span>
             </div>
+
+            <!-- Password Fields -->
             <div class="form-group">
                 <label for="password">Password</label>
-                <input id="password" name="password" type="password" required autocomplete="new-password" minlength="6" maxlength="24" title="Password must be 6-24 characters long" oninput="validatePasswords()">
+                <input 
+                    id="password" 
+                    name="password" 
+                    type="password" 
+                    required 
+                    minlength="6" 
+                    maxlength="24"
+                    title="Password must be 6-24 characters long"
+                    oninput="validatePasswords()"
+                >
             </div>
+
             <div class="form-group">
                 <label for="confirm_password">Confirm Password</label>
-                <input id="confirm_password" name="confirm_password" type="password" required autocomplete="new-password" minlength="6" maxlength="24" title="Password must be 6-24 characters long" oninput="validatePasswords()">
-                <span id="password-error" class="input-error">Passwords do not match.</span>
+                <input 
+                    id="confirm_password" 
+                    name="confirm_password" 
+                    type="password" 
+                    required 
+                    minlength="6" 
+                    maxlength="24"
+                    oninput="validatePasswords()"
+                >
+                <span id="password-error" class="input-error">Passwords don't match</span>
             </div>
-            <input type="submit" value="Register">
+
+            <input type="submit" value="Create Account">
         </form>
-        <a class="register-link" href="{{ url_for('main.login') }}">Already have an account? Login</a>
+
+        <a class="register-link" href="{{ url_for('main.login') }}">Already registered? Log in here</a>
     </div>
+
+    <!-- Form Validation Scripts -->
     <script>
-function validateEmail() {
-    const emailInput = document.getElementById('email');
-    const emailError = document.getElementById('email-error');
-    if (emailInput.validity.typeMismatch || !emailInput.value) {
-        emailError.classList.add('active');
-    } else {
-        emailError.classList.remove('active');
-    }
-}
-function validatePasswords() {
-    const pw1 = document.getElementById('password');
-    const pw2 = document.getElementById('confirm_password');
-    const pwError = document.getElementById('password-error');
-    if (pw1.value && pw2.value && pw1.value !== pw2.value) {
-        pwError.classList.add('active');
-    } else {
-        pwError.classList.remove('active');
-    }
-}
-</script>
+        // Email validation
+        function validateEmail() {
+            let emailInput = document.getElementById('email');
+            let errorSpan = document.getElementById('email-error');
+            
+            if (!emailInput.value || emailInput.validity.typeMismatch) {
+                errorSpan.classList.add('active');
+            } else {
+                errorSpan.classList.remove('active');
+            }
+        }
+
+        // Password matching validation
+        function validatePasswords() {
+            let password = document.getElementById('password');
+            let confirmPassword = document.getElementById('confirm_password');
+            let errorSpan = document.getElementById('password-error');
+            
+            if (password.value && confirmPassword.value) {
+                if (password.value !== confirmPassword.value) {
+                    errorSpan.classList.add('active');
+                } else {
+                    errorSpan.classList.remove('active');
+                }
+            }
+        }
+
+        // Check if username is already taken
+        async function checkUsername(username) {
+            try {
+                const response = await fetch(`/check_username?username=${encodeURIComponent(username)}`);
+                const data = await response.json();
+                
+                let errorSpan = document.getElementById('username-error');
+                if (!data.available) {
+                    errorSpan.textContent = 'This username is already taken';
+                    errorSpan.classList.add('active');
+                } else {
+                    errorSpan.classList.remove('active');
+                }
+            } catch (error) {
+                console.error('Error checking username:', error);
+            }
+        }
+
+        // Check if email is already registered
+        async function checkEmail(email) {
+            try {
+                const response = await fetch(`/check_email?email=${encodeURIComponent(email)}`);
+                const data = await response.json();
+                
+                let errorSpan = document.getElementById('email-error');
+                if (!data.available) {
+                    errorSpan.textContent = 'This email is already registered';
+                    errorSpan.classList.add('active');
+                } else {
+                    errorSpan.classList.remove('active');
+                }
+            } catch (error) {
+                console.error('Error checking email:', error);
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('username').addEventListener('blur', (e) => {
+            if (e.target.value.trim()) {
+                checkUsername(e.target.value.trim());
+            }
+        });
+
+        document.getElementById('email').addEventListener('blur', (e) => {
+            if (e.target.value.trim() && e.target.validity.valid) {
+                checkEmail(e.target.value.trim());
+            }
+        });
+    </script>
 </body>
 </html>

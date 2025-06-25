@@ -51,6 +51,16 @@ def register():
             'email': email,
         }
 
+        # Check if username exists
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists. Please choose another.')
+            return render_template('register.html', **form_data)
+
+        # Check if email exists
+        if User.query.filter_by(email=email).first():
+            flash('Email already registered. Please use another email or login.')
+            return render_template('register.html', **form_data)
+
         validation = ValidationService()
         valid, msg = validation.validate_username(username)
         if not valid:

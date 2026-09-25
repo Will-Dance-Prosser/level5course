@@ -61,7 +61,7 @@ A Flask-based web application for managing breakdown cover insurance quotes, wit
 - For deployment, see Flask documentation or use a WSGI server like Gunicorn.
 
 ## License
-MIT License (or specify your own)
+MIT License
 
 ---
 For questions or contributions, please open an issue or pull request.
